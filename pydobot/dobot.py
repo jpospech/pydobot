@@ -221,7 +221,7 @@ class Dobot:
     """
     def _set_ptp_cmd(self, x, y, z, r, mode, wait):
         msg = Message()
-        msg.id = CommunicationProtocolIDs.SET_PTP_CMD
+        msg.id = 84
         msg.ctrl = ControlValues.THREE
         msg.params = bytearray([])
         msg.params.extend(bytearray([mode]))
@@ -230,6 +230,10 @@ class Dobot:
         msg.params.extend(bytearray(struct.pack('f', z)))
         msg.params.extend(bytearray(struct.pack('f', r)))
         return self._send_command(msg, wait)
+
+
+
+
 
     """
         Clears command queue
@@ -294,3 +298,82 @@ class Dobot:
         j3 = struct.unpack_from('f', response.params, 24)[0]
         j4 = struct.unpack_from('f', response.params, 28)[0]
         return x, y, z, r, j1, j2, j3, j4
+
+    def wait(self, ms, wait=False):
+        self._set_wait_cmd(ms, wait)
+
+    def start_stepper(self, pps, motor=0, wait=False):
+        self._set_emotor(motor, 1, pps, wait)
+
+    def stop_stepper(self, motor=0, wait=False):
+        self._set_emotor(motor, 0, 0, wait)
+
+    def start_conveyor(self, speed, motor=0, wait=False):
+        self._set_emotor(motor, 1, int(19800*speed), wait) #
+
+    def set_io_mode(self, address, mode, wait=False):
+        self._set_io_multiplexing(address, IO_MODES[mode], wait)
+
+    def set_pwm_output(self, address, frequency, duty_cycle, wait=False):
+        self._set_io_pwm(address, frequency, duty_cycle, wait)
+
+
+#####
+    def _set_ptp_withL_cmd(self, x, y, z, r, l, mode, wait):
+        msg = Message()
+        msg.id = 86
+        msg.ctrl = 1
+        msg.params = bytearray([])
+        msg.params.extend(bytearray([mode]))
+        msg.params.extend(bytearray(struct.pack('f', x)))
+        msg.params.extend(bytearray(struct.pack('f', y)))
+        msg.params.extend(bytearray(struct.pack('f', z)))
+        msg.params.extend(bytearray(struct.pack('f', r)))
+        msg.params.extend(bytearray(struct.pack('f', l)))
+
+        return self._send_command(msg, wait)
+
+    def move_to_withL(self, x, y, z, r, l, wait=False):
+        self._set_ptp_withL_cmd(x, y, z, r, l, mode = PTPMode.MOVL_XYZ, wait = wait)
+    def move_conveyor(self, distance, direction, motor = 0,speed=6000, wait= False):
+        # distance in cm
+        # direction: 0=forward, 1=backward
+
+        if direction==1:
+            speed = speed*-1
+        self.start_stepper(speed, motor, wait) #cca 5cm/sec
+        self.wait(120*distance)
+        self.stop_stepper(motor, wait)
+
+    def enable_rail(self, wait=False):
+        msg = Message()
+        msg.id = 3
+        msg.ctrl = 3
+        msg.params = bytearray([])
+        msg.params.extend(bytearray(struct.pack('i', 1)))
+        return self._send_command(msg, wait)
+    
+    def _set_color_sensor(self, state, port=0x01, wait=False):
+        msg = Message()
+        msg.id = 137
+        msg.ctrl = 3
+        msg.params = bytearray([])
+        msg.params.extend(bytearray(struct.pack('i', state)))
+        return self._send_command(msg, wait)
+
+    def enable_color_sensor(self, port=0x01, wait=False):
+        self._set_color_sensor(1, port, wait)
+
+    def disable_color_sensor(self, port=0x01, wait=False):
+        self._set_color_sensor(0, port, wait)
+
+    def read_color(self, port=0x01, wait=False):
+        msg = Message()
+        msg.id = 137
+        msg.ctrl = 0
+        response = self._send_command(msg, wait)
+        r = struct.unpack_from('?', response.params, 0)[0]
+        g = struct.unpack_from('?', response.params, 1)[0]
+        b = struct.unpack_from('?', response.params, 2)[0]
+        return [r, g, b]
+

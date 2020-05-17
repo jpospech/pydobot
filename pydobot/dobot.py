@@ -387,7 +387,7 @@ class Dobot:
         return [r, g, b]
 
 
-class CommunicationProtocolIDs(Enum):
+class CommunicationProtocolIDs():
 
     GET_SET_DEVICE_SN = 0
     GET_SET_DEVICE_NAME = 1

@@ -4,7 +4,7 @@ import time
 import threading
 import warnings
 
-from message import Message
+from .message import Message
 
 PORT_GP2 = 0x01
 MODE_PTP_JUMP_XYZ = 0x00

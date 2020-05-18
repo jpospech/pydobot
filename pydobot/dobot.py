@@ -315,7 +315,7 @@ class Dobot:
         self.move_to(x, y, z, r)
 
     def move_to(self, x, y, z, r, wait=False):
-        self._set_ptp_cmd(x, y, z, r, mode=PTPMode.MOVL_XYZ, wait=wait)
+        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ, wait=wait)
 
     def suck(self, enable):
         self._set_end_effector_suction_cup(enable)
@@ -374,7 +374,7 @@ class Dobot:
         return self._send_command(msg, wait)
 
     def move_to_withL(self, x, y, z, r, l, wait=False):
-        self._set_ptp_withL_cmd(x, y, z, r, l, mode = PTPMode.MOVL_XYZ, wait = wait)
+        self._set_ptp_withL_cmd(x, y, z, r, l, mode = MODE_PTP_MOVL_XYZ, wait = wait)
     def move_conveyor(self, distance, direction, motor = 0,speed=6000, wait= False):
         # distance in cm
         # direction: 0=forward, 1=backward

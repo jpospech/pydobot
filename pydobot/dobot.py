@@ -5,7 +5,7 @@ import threading
 import warnings
 
 from .message import Message
-
+#tom je kokot
 PORT_GP2 = 0x01
 MODE_PTP_JUMP_XYZ = 0x00
 MODE_PTP_MOVJ_XYZ = 0x01

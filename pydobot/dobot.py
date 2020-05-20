@@ -50,6 +50,7 @@ GET_QUEUED_CMD_CURRENT_INDEX = 246
 
 IO_MODES = {'Dummy': 1, 'PWM': 2, 'DO': 3, 'DI': 4, 'ADC': 5}
 
+
 class Dobot:
 
     def __init__(self, port, verbose=False):
@@ -72,12 +73,13 @@ class Dobot:
         self._set_ptp_joint_params(200, 200, 200, 200, 200, 200, 200, 200)
         self._set_ptp_coordinate_params(velocity=200, acceleration=200)
         self._set_ptp_jump_params(10, 200)
-        self._set_ptp_common_params(velocity=100, acceleration=100)
+        self._set_ptp_common_params(velocity=50, acceleration=50)
         self._get_pose()
 
     """
         Gets the current command index
     """
+
     def _get_queued_cmd_current_index(self):
         msg = Message()
         msg.id = GET_QUEUED_CMD_CURRENT_INDEX
@@ -88,6 +90,7 @@ class Dobot:
     """
         Gets the real-time pose of the Dobot
     """
+
     def _get_pose(self):
         msg = Message()
         msg.id = 10
@@ -158,6 +161,7 @@ class Dobot:
     """
         Executes the CP Command
     """
+
     def _set_cp_cmd(self, x, y, z):
         msg = Message()
         msg.id = SET_CP_CMD
@@ -172,6 +176,7 @@ class Dobot:
     """
         Sets the status of the gripper
     """
+
     def _set_end_effector_gripper(self, enable=False):
         msg = Message()
         msg.id = SET_GET_END_EFFECTOR_GRIPPER
@@ -187,6 +192,7 @@ class Dobot:
     """
         Sets the status of the suction cup
     """
+
     def _set_end_effector_suction_cup(self, enable=False):
         msg = Message()
         msg.id = SET_GET_END_EFFECTOR_SUCTION_CUP
@@ -202,6 +208,7 @@ class Dobot:
     """
         Sets the velocity ratio and the acceleration ratio in PTP mode
     """
+
     def _set_ptp_joint_params(self, v_x, v_y, v_z, v_r, a_x, a_y, a_z, a_r):
         msg = Message()
         msg.id = SET_GET_PTP_JOINT_PARAMS
@@ -220,6 +227,7 @@ class Dobot:
     """
         Sets the velocity and acceleration of the Cartesian coordinate axes in PTP mode
     """
+
     def _set_ptp_coordinate_params(self, velocity, acceleration):
         msg = Message()
         msg.id = SET_GET_PTP_COORDINATE_PARAMS
@@ -234,6 +242,7 @@ class Dobot:
     """
        Sets the lifting height and the maximum lifting height in JUMP mode
     """
+
     def _set_ptp_jump_params(self, jump, limit):
         msg = Message()
         msg.id = SET_GET_PTP_JUMP_PARAMS
@@ -243,10 +252,10 @@ class Dobot:
         msg.params.extend(bytearray(struct.pack('f', limit)))
         return self._send_command(msg)
 
-
     """
         Sets the velocity ratio, acceleration ratio in PTP mode
     """
+
     def _set_ptp_common_params(self, velocity, acceleration):
         msg = Message()
         msg.id = SET_GET_PTP_COMMON_PARAMS
@@ -259,6 +268,7 @@ class Dobot:
     """
         Executes PTP command
     """
+
     def _set_ptp_cmd(self, x, y, z, r, mode, wait):
         msg = Message()
         msg.id = 84
@@ -271,13 +281,10 @@ class Dobot:
         msg.params.extend(bytearray(struct.pack('f', r)))
         return self._send_command(msg, wait)
 
-
-
-
-
     """
         Clears command queue
     """
+
     def _set_queued_cmd_clear(self):
         msg = Message()
         msg.id = SET_QUEUED_CMD_CLEAR
@@ -287,6 +294,7 @@ class Dobot:
     """
         Start command
     """
+
     def _set_queued_cmd_start_exec(self):
         msg = Message()
         msg.id = SET_QUEUED_CMD_START_EXEC
@@ -296,6 +304,7 @@ class Dobot:
     """
         Stop command
     """
+
     def _set_queued_cmd_stop_exec(self):
         msg = Message()
         msg.id = SET_QUEUED_CMD_STOP_EXEC
@@ -315,7 +324,7 @@ class Dobot:
         self.move_to(x, y, z, r)
 
     def move_to(self, x, y, z, r, wait=False):
-        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ, wait=wait)
+        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ, wait=wait)
 
     def suck(self, enable):
         self._set_end_effector_suction_cup(enable)
@@ -349,7 +358,7 @@ class Dobot:
         self._set_emotor(motor, 0, 0, wait)
 
     def start_conveyor(self, speed, motor=0, wait=False):
-        self._set_emotor(motor, 1, int(19800*speed), wait) #
+        self._set_emotor(motor, 1, int(19800 * speed), wait)  #
 
     def set_io_mode(self, address, mode, wait=False):
         self._set_io_multiplexing(address, IO_MODES[mode], wait)
@@ -357,8 +366,7 @@ class Dobot:
     def set_pwm_output(self, address, frequency, duty_cycle, wait=False):
         self._set_io_pwm(address, frequency, duty_cycle, wait)
 
-
-#####
+    #####
     def _set_ptp_withL_cmd(self, x, y, z, r, l, mode, wait):
         msg = Message()
         msg.id = 86
@@ -373,16 +381,17 @@ class Dobot:
 
         return self._send_command(msg, wait)
 
-    def move_to_withL(self, x, y, z, r, l, wait=False):
-        self._set_ptp_withL_cmd(x, y, z, r, l, mode = MODE_PTP_MOVL_XYZ, wait = wait)
-    def move_conveyor(self, distance, direction, motor = 0,speed=6000, wait= False):
+    def move_to_withL(self, x, y, z, r, l, wait=True):
+        self._set_ptp_withL_cmd(x, y, z, r, l, mode=0x02, wait=wait)
+
+    def move_conveyor(self, distance, direction, motor=0, speed=6000, wait=False):
         # distance in cm
         # direction: 0=forward, 1=backward
 
-        if direction==1:
-            speed = speed*-1
-        self.start_stepper(speed, motor, wait) #cca 5cm/sec
-        self.wait(120*distance)
+        if direction == 1:
+            speed = speed * -1
+        self.start_stepper(speed, motor, wait)  # cca 5cm/sec
+        self.wait(228 * distance)
         self.stop_stepper(motor, wait)
 
     def enable_rail(self, wait=False):
@@ -390,16 +399,19 @@ class Dobot:
         msg.id = 3
         msg.ctrl = 3
         msg.params = bytearray([])
-        msg.params.extend(bytearray(struct.pack('i', 1)))
+        msg.params.extend(bytearray(struct.pack('i', int(True))))
         return self._send_command(msg, wait)
-    
+
     def _set_color_sensor(self, state, port=0x01, wait=False):
         msg = Message()
         msg.id = 137
-        msg.ctrl = 3
+        msg.ctrl = 0x03
         msg.params = bytearray([])
-        msg.params.extend(bytearray(struct.pack('i', state)))
-        return self._send_command(msg, wait)
+        msg.params.extend(bytearray([int(state)]))
+        msg.params.extend(bytearray([port]))
+        msg.params.extend(bytearray([1]))
+        print("msg")
+        return self._send_command(msg, True)
 
     def enable_color_sensor(self, port=0x01, wait=False):
         self._set_color_sensor(1, port, wait)
@@ -411,15 +423,33 @@ class Dobot:
         msg = Message()
         msg.id = 137
         msg.ctrl = 0
+        msg.params = bytearray([])
+        msg.params.extend(bytearray(struct.pack('i', port)))
         response = self._send_command(msg, wait)
         r = struct.unpack_from('?', response.params, 0)[0]
         g = struct.unpack_from('?', response.params, 1)[0]
         b = struct.unpack_from('?', response.params, 2)[0]
+
         return [r, g, b]
+
+    def _set_emotor(self, index, enabled, speed, wait=False):
+        msg = Message()
+        msg.id = 135
+        msg.ctrl = 0x03
+        msg.params = bytearray(struct.pack('B', index))
+        msg.params.extend(bytearray(struct.pack('B', enabled)))
+        msg.params.extend(bytearray(struct.pack('i', speed)))
+        return self._send_command(msg, wait=wait)
+
+    def _set_wait_cmd(self, ms, wait):
+        msg = Message()
+        msg.id = 110
+        msg.ctrl = 0x03
+        msg.params = bytearray(struct.pack('I', ms))
+        return self._send_command(msg, wait=wait)
 
 
 class CommunicationProtocolIDs():
-
     GET_SET_DEVICE_SN = 0
     GET_SET_DEVICE_NAME = 1
     GET_POSE = 10

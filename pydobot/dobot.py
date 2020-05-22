@@ -446,15 +446,12 @@ class Dobot:
         msg.params = bytearray(struct.pack('I', ms))
         return self._send_command(msg, wait=wait)
 
-    def _set_home_cmd(self):
+    def home(self, wait=False):
         msg = Message()
         msg.id = 31
         msg.ctrl = 0x03
         msg.params = bytearray([])
-        msg.params.extend(bytearray([1]))
         self._send_command(msg, True)
-    def home(self):
-        self._set_home_cmd()
 
 
 class CommunicationProtocolIDs():

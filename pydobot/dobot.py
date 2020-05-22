@@ -452,9 +452,9 @@ class Dobot:
         msg.ctrl = 0x03
         msg.params = bytearray([])
         msg.params.extend(bytearray([1]))
-        return self._send_command(msg, True)
+        self._send_command(msg, True)
     def home(self):
-        return self._set_home_cmd()
+        self._set_home_cmd()
 
 
 class CommunicationProtocolIDs():

@@ -5,7 +5,6 @@ import threading
 import warnings
 
 from .message import Message
-#tom je kokot
 PORT_GP2 = 0x01
 MODE_PTP_JUMP_XYZ = 0x00
 MODE_PTP_MOVJ_XYZ = 0x01
@@ -410,7 +409,6 @@ class Dobot:
         msg.params.extend(bytearray([int(state)]))
         msg.params.extend(bytearray([port]))
         msg.params.extend(bytearray([1]))
-        print("msg")
         return self._send_command(msg, True)
 
     def enable_color_sensor(self, port=0x01, wait=False):
@@ -447,6 +445,16 @@ class Dobot:
         msg.ctrl = 0x03
         msg.params = bytearray(struct.pack('I', ms))
         return self._send_command(msg, wait=wait)
+
+    def _set_home_cmd(self):
+        msg = Message()
+        msg.id = 31
+        msg.ctrl = 0x03
+        msg.params = bytearray([])
+        msg.params.extend(bytearray([1]))
+        return self._send_command(msg, True)
+    def home(self):
+        return self._set_home_cmd()
 
 
 class CommunicationProtocolIDs():

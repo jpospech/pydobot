@@ -450,7 +450,6 @@ class Dobot:
         msg = Message()
         msg.id = 31
         msg.ctrl = 0x03
-        msg.params = bytearray([])
         self._send_command(msg, True)
 
 

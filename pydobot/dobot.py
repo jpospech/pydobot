@@ -326,13 +326,13 @@ class Dobot:
 
     def move_to(self, x, y, z, r, wait=False):
         wait = self.wait
-        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ, wait=wait)
+        return self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ, wait=wait)
 
     def suck(self, enable):
-        self._set_end_effector_suction_cup(enable)
+        return self._set_end_effector_suction_cup(enable)
 
     def grip(self, enable):
-        self._set_end_effector_gripper(enable)
+        return self._set_end_effector_gripper(enable)
 
     def speed(self, velocity=100., acceleration=100.):
         self._set_ptp_common_params(velocity, acceleration)
@@ -352,27 +352,28 @@ class Dobot:
 
     def wait(self, ms, wait=False):
         wait = self.wait
-        self._set_wait_cmd(ms, wait)
+        return self._set_wait_cmd(ms, wait)
 
     def start_stepper(self, pps, motor=0, wait=False):
         wait = self.wait
-        self._set_emotor(motor, 1, pps, wait)
+        return self._set_emotor(motor, 1, pps, wait)
 
     def stop_stepper(self, motor=0, wait=False):
         wait = self.wait
-        self._set_emotor(motor, 0, 0, wait)
+        return self._set_emotor(motor, 0, 0, wait)
 
     def start_conveyor(self, speed, motor=0, wait=False):
         wait = self.wait
-        self._set_emotor(motor, 1, int(19800 * speed), wait)  
+        return self._set_emotor(motor, 1, int(19800 * speed), wait)
 
     def set_io_mode(self, address, mode, wait=False):
         wait = self.wait
-        self._set_io_multiplexing(address, IO_MODES[mode], wait)
+        return self._set_io_multiplexing(address, IO_MODES[mode], wait)
+
 
     def set_pwm_output(self, address, frequency, duty_cycle, wait=False):
         wait = self.wait
-        self._set_io_pwm(address, frequency, duty_cycle, wait)
+        return self._set_io_pwm(address, frequency, duty_cycle, wait)
 
     #####
     def _set_ptp_withL_cmd(self, x, y, z, r, l, mode, wait):
@@ -387,12 +388,11 @@ class Dobot:
         msg.params.extend(bytearray(struct.pack('f', z)))
         msg.params.extend(bytearray(struct.pack('f', r)))
         msg.params.extend(bytearray(struct.pack('f', l)))
-
         return self._send_command(msg, wait)
 
     def move_to_withL(self, x, y, z, r, l, wait=True):
         wait = self.wait
-        self._set_ptp_withL_cmd(x, y, z, r, l, mode=0x02, wait=wait)
+        return self._set_ptp_withL_cmd(x, y, z, r, l, mode=0x02, wait=wait)
 
     def move_conveyor(self, distance, direction, motor=0, speed=6000, wait=False):
         # distance in cm
@@ -403,6 +403,7 @@ class Dobot:
         self.start_stepper(speed, motor, wait)  # cca 5cm/sec
         self.wait(228 * distance)
         self.stop_stepper(motor, wait)
+        return 1
 
     def enable_rail(self, wait=False):
         wait = self.wait
@@ -426,11 +427,12 @@ class Dobot:
 
     def enable_color_sensor(self, port=0x01, wait=False):
         wait = self.wait
-        self._set_color_sensor(1, port, wait)
+        return self._set_color_sensor(1, port, wait)
 
     def disable_color_sensor(self, port=0x01, wait=False):
         wait = self.wait
-        self._set_color_sensor(0, port, wait)
+        return self._set_color_sensor(0, port, wait)
+
 
     def read_color(self, port=0x01, wait=False):
         wait = self.wait
@@ -443,7 +445,6 @@ class Dobot:
         r = struct.unpack_from('?', response.params, 0)[0]
         g = struct.unpack_from('?', response.params, 1)[0]
         b = struct.unpack_from('?', response.params, 2)[0]
-
         return [r, g, b]
 
     def _set_emotor(self, index, enabled, speed, wait=False):
@@ -469,7 +470,8 @@ class Dobot:
         msg = Message()
         msg.id = 31
         msg.ctrl = 0x03
-        self._send_command(msg, True)
+        return self._send_command(msg, True)
+
 
 
 class CommunicationProtocolIDs():

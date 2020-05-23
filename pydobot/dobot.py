@@ -18,7 +18,7 @@ MODE_PTP_MOVJ_XYZ_INC = 0x08
 MODE_PTP_JUMP_MOVL_XYZ = 0x09
 
 GET_SET_DEVICE_SN = 0
-GET_SET_DEVICE_NAME = 1
+GET_SET_DEVICE_NAME = 1 
 GET_POSE = 10
 RESET_POSE = 11
 GET_ALARMS_STATE = 20
@@ -52,9 +52,10 @@ IO_MODES = {'Dummy': 1, 'PWM': 2, 'DO': 3, 'DI': 4, 'ADC': 5}
 
 class Dobot:
 
-    def __init__(self, port, verbose=False):
+    def __init__(self, port,isSynchronous=True, verbose=False):
         threading.Thread.__init__(self)
 
+        self.wait = isSynchronous
         self._on = True
         self.verbose = verbose
         self.lock = threading.Lock()
@@ -155,7 +156,8 @@ class Dobot:
         time.sleep(0.1)
         if self.verbose:
             print('pydobot: >>', msg)
-        self.ser.write(msg.bytes())
+        print(msg.bytes())
+        #self.ser.write(msg.bytes())
 
     """
         Executes the CP Command
@@ -323,6 +325,7 @@ class Dobot:
         self.move_to(x, y, z, r)
 
     def move_to(self, x, y, z, r, wait=False):
+        wait = self.wait
         self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ, wait=wait)
 
     def suck(self, enable):
@@ -348,25 +351,32 @@ class Dobot:
         return x, y, z, r, j1, j2, j3, j4
 
     def wait(self, ms, wait=False):
+        wait = self.wait
         self._set_wait_cmd(ms, wait)
 
     def start_stepper(self, pps, motor=0, wait=False):
+        wait = self.wait
         self._set_emotor(motor, 1, pps, wait)
 
     def stop_stepper(self, motor=0, wait=False):
+        wait = self.wait
         self._set_emotor(motor, 0, 0, wait)
 
     def start_conveyor(self, speed, motor=0, wait=False):
-        self._set_emotor(motor, 1, int(19800 * speed), wait)  #
+        wait = self.wait
+        self._set_emotor(motor, 1, int(19800 * speed), wait)  
 
     def set_io_mode(self, address, mode, wait=False):
+        wait = self.wait
         self._set_io_multiplexing(address, IO_MODES[mode], wait)
 
     def set_pwm_output(self, address, frequency, duty_cycle, wait=False):
+        wait = self.wait
         self._set_io_pwm(address, frequency, duty_cycle, wait)
 
     #####
     def _set_ptp_withL_cmd(self, x, y, z, r, l, mode, wait):
+        wait = self.wait
         msg = Message()
         msg.id = 86
         msg.ctrl = 3
@@ -381,12 +391,13 @@ class Dobot:
         return self._send_command(msg, wait)
 
     def move_to_withL(self, x, y, z, r, l, wait=True):
+        wait = self.wait
         self._set_ptp_withL_cmd(x, y, z, r, l, mode=0x02, wait=wait)
 
     def move_conveyor(self, distance, direction, motor=0, speed=6000, wait=False):
         # distance in cm
         # direction: 0=forward, 1=backward
-
+        wait = self.wait
         if direction == 1:
             speed = speed * -1
         self.start_stepper(speed, motor, wait)  # cca 5cm/sec
@@ -394,6 +405,7 @@ class Dobot:
         self.stop_stepper(motor, wait)
 
     def enable_rail(self, wait=False):
+        wait = self.wait
         msg = Message()
         msg.id = 3
         msg.ctrl = 3
@@ -402,6 +414,7 @@ class Dobot:
         return self._send_command(msg, wait)
 
     def _set_color_sensor(self, state, port=0x01, wait=False):
+        wait = self.wait
         msg = Message()
         msg.id = 137
         msg.ctrl = 0x03
@@ -412,12 +425,15 @@ class Dobot:
         return self._send_command(msg, True)
 
     def enable_color_sensor(self, port=0x01, wait=False):
+        wait = self.wait
         self._set_color_sensor(1, port, wait)
 
     def disable_color_sensor(self, port=0x01, wait=False):
+        wait = self.wait
         self._set_color_sensor(0, port, wait)
 
     def read_color(self, port=0x01, wait=False):
+        wait = self.wait
         msg = Message()
         msg.id = 137
         msg.ctrl = 0
@@ -431,6 +447,7 @@ class Dobot:
         return [r, g, b]
 
     def _set_emotor(self, index, enabled, speed, wait=False):
+        wait = self.wait
         msg = Message()
         msg.id = 135
         msg.ctrl = 0x03
@@ -440,6 +457,7 @@ class Dobot:
         return self._send_command(msg, wait=wait)
 
     def _set_wait_cmd(self, ms, wait):
+        wait = self.wait
         msg = Message()
         msg.id = 110
         msg.ctrl = 0x03
@@ -447,6 +465,7 @@ class Dobot:
         return self._send_command(msg, wait=wait)
 
     def home(self, wait=False):
+        wait = self.wait
         msg = Message()
         msg.id = 31
         msg.ctrl = 0x03

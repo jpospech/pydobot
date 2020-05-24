@@ -350,7 +350,7 @@ class Dobot:
         j4 = struct.unpack_from('f', response.params, 28)[0]
         return x, y, z, r, j1, j2, j3, j4
 
-    def wait(self, ms, wait=False):
+    def set_wait(self, ms, wait=False):
         wait = self.wait
         return self._set_wait_cmd(ms, wait)
 
@@ -401,7 +401,7 @@ class Dobot:
         if direction == 1:
             speed = speed * -1
         self.start_stepper(speed, motor, wait)  # cca 5cm/sec
-        self.wait(228 * distance)
+        self.set_wait(228 * distance)
         self.stop_stepper(motor, wait)
         return 1
 

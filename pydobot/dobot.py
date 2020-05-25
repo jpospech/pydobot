@@ -357,11 +357,11 @@ class Dobot:
         return self._set_wait_cmd(ms, wait)
 
     def start_stepper(self, pps, motor=0, wait=False):
-        wait = self.wait
+        wait = False
         return self._set_emotor(motor, 1, pps, wait)
 
     def stop_stepper(self, motor=0, wait=False):
-        wait = self.wait
+        wait = False
         return self._set_emotor(motor, 0, 0, wait)
 
     def start_conveyor(self, speed, motor=0, wait=False):

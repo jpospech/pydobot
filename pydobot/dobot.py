@@ -204,7 +204,7 @@ class Dobot:
             msg.params.extend(bytearray([0x01]))
         else:
             msg.params.extend(bytearray([0x00]))
-        print("sucking")
+        print("sucking"+str(enable))
         time.sleep(1)
         return self._send_command(msg)
 

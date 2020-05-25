@@ -436,7 +436,7 @@ class Dobot:
 
 
     def read_color(self, port=0x01, wait=False):
-        wait = self.wait
+        wait = False
         msg = Message()
         msg.id = 137
         msg.ctrl = 0

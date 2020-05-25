@@ -353,8 +353,7 @@ class Dobot:
         return x, y, z, r, j1, j2, j3, j4
 
     def set_wait(self, ms, wait=False):
-        wait = self.wait
-        return self._set_wait_cmd(ms, wait)
+        return self._set_wait_cmd(ms, False)
 
     def start_stepper(self, pps, motor=0, wait=False):
         wait = False

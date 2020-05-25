@@ -204,8 +204,6 @@ class Dobot:
             msg.params.extend(bytearray([0x01]))
         else:
             msg.params.extend(bytearray([0x00]))
-        print("sucking"+str(enable))
-        time.sleep(1)
         return self._send_command(msg)
 
     """
@@ -331,7 +329,8 @@ class Dobot:
         return self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ, wait=wait)
 
     def suck(self, enable):
-        return self._set_end_effector_suction_cup(enable)
+        cmd = self._set_end_effector_suction_cup(enable)
+        return cmd
 
     def grip(self, enable):
         return self._set_end_effector_gripper(enable)

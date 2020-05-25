@@ -330,6 +330,7 @@ class Dobot:
 
     def suck(self, enable):
         cmd = self._set_end_effector_suction_cup(enable)
+        time.sleep(0.2)
         return cmd
 
     def grip(self, enable):

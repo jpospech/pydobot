@@ -52,7 +52,7 @@ IO_MODES = {'Dummy': 1, 'PWM': 2, 'DO': 3, 'DI': 4, 'ADC': 5}
 
 class Dobot:
 
-    def __init__(self, port,isSynchronous=True, verbose=False):
+    def __init__(self, port,isSynchronous=False, verbose=False):
         threading.Thread.__init__(self)
 
         self.wait = isSynchronous

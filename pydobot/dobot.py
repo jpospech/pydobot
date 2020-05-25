@@ -399,7 +399,7 @@ class Dobot:
     def move_conveyor(self, distance, direction, motor=0, speed=6000, wait=False):
         # distance in cm
         # direction: 0=forward, 1=backward
-        wait = self.wait
+        wait = False
         if direction == 1:
             speed = speed * -1
         self.start_stepper(speed, motor, wait)  # cca 5cm/sec

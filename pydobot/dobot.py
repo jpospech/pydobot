@@ -459,7 +459,7 @@ class Dobot:
         return self._send_command(msg, wait=wait)
 
     def _set_wait_cmd(self, ms, wait):
-        wait = False
+        wait = True
         msg = Message()
         msg.id = 110
         msg.ctrl = 0x03

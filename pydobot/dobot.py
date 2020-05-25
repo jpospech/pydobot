@@ -450,7 +450,7 @@ class Dobot:
         return [r, g, b]
 
     def _set_emotor(self, index, enabled, speed, wait=False):
-        wait = self.wait
+        wait = False
         msg = Message()
         msg.id = 135
         msg.ctrl = 0x03
